@@ -1,0 +1,17 @@
+[package]
+name = "mangoverlay"
+edition.workspace = true
+license.workspace = true
+# rust-version.workspace = true
+version.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# local crates
+mangohudlib.workspace = true
+
+# non-local crates
+egui = "0.21.0"
+eframe = "0.21.3"
+egui-modal = "0.2.3"

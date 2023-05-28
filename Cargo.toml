@@ -1,0 +1,29 @@
+[workspace.package]
+edition = "2021"
+license = "GPLv3"
+# rust-version = "1.68"
+version = "0.1.0"
+
+[workspace]
+members = ["crates/*"]
+
+[profile.release]
+strip = true
+opt-level = "s"
+lto = "thin"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[workspace.dependencies]
+# local crates
+mangohudlib = { path = "crates/mangohudlib" }
+
+# non-local crates
+color-eyre = "0.6.2"
+eyre = "0.6"
+fs-err = "2.9.0"
+itertools = "0.10.5"
+serde = { version = "1.0", features = ["derive"] }
+tracing = "0.1"
+tracing-appender = "0.2"
+tracing-subscriber = "0.3"
