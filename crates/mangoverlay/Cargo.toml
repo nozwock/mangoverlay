@@ -12,6 +12,6 @@ version.workspace = true
 mangohudlib.workspace = true
 
 # non-local crates
-egui = "0.21.0"
-eframe = "0.21.3"
+egui.workspace = true
+eframe = "0.22.0"
 egui-modal = "0.2.3"

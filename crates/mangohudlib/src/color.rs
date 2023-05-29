@@ -1,0 +1,16 @@
+use rgb::RGB8;
+
+pub const WHITE: RGB8 = RGB8::new(0xff, 0xff, 0xff);
+pub const ALMOST_BLACK: RGB8 = RGB8::new(0x02, 0x02, 0x02);
+pub const BLACK: RGB8 = RGB8::new(0x00, 0x00, 0x00);
+pub const BLUE: RGB8 = RGB8::new(0x2e, 0x97, 0xcb);
+pub const LIGHT_MAGENTA: RGB8 = RGB8::new(0xad, 0x64, 0xc1);
+pub const LIGHT_PINK: RGB8 = RGB8::new(0xc2, 0x66, 0x93);
+pub const LIGHT_VIOLET: RGB8 = RGB8::new(0xa4, 0x91, 0xd3);
+pub const GREEN: RGB8 = RGB8::new(0x00, 0xff, 0x00);
+pub const LIME_GREEN: RGB8 = RGB8::new(0x00, 0xff, 0x00);
+pub const DARK_LIME_GREEN: RGB8 = RGB8::new(0x2e, 0x97, 0x62);
+pub const SOFT_RED: RGB8 = RGB8::new(0xeb, 0x5b, 0x5b);
+pub const LIGHT_RED: RGB8 = RGB8::new(0xff, 0x90, 0x78);
+pub const DARK_RED: RGB8 = RGB8::new(0xb2, 0x22, 0x22);
+pub const VIVID_YELLOW: RGB8 = RGB8::new(0xfd, 0xfd, 0x09);
