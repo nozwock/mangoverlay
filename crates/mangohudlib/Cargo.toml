@@ -10,5 +10,9 @@ version.workspace = true
 [dependencies]
 # non-local crates
 egui.workspace = true
+eyre.workspace = true
+fs-err.workspace = true
 rgb.workspace = true
 hex.workspace = true
+configparser = { version = "3.0", features = ["indexmap"] }
+strum = { version = "0.24", features = ["derive"] }

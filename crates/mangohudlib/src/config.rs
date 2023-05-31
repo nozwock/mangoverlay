@@ -2,35 +2,29 @@
 //! https://github.com/flightlessmango/MangoHud#environment-variables-mangohud_config-and-mangohud_configfile
 
 use std::{
-    collections::HashMap,
     path::{Path, PathBuf},
-    str::Lines,
+    str::FromStr,
     time::Duration,
 };
 
-use egui::KeyboardShortcut;
+use eyre::Result;
 use rgb::RGB8;
+use strum::EnumString;
 
 use crate::color::*;
 
 // Defaults:
 // https://github.com/flightlessmango/MangoHud/blob/6306fed7f749837f2a780c883743af3a116a5465/src/overlay_params.cpp#L587
 
-// NOTE: Serialize bool as 0/1.
-// NOTE: `gpu_mem_clock` and `gpu_mem_temp` also need `vram` to be enabled.
-
-/// Ordered only if `legacy_layout` is set to false.
-pub enum OrderableParam {
-    Time,
-    Version,
-    Fps,
-    // TODO think of a better way
-}
+// NOTE:
+// - Serialize bool as 0/1.
+// - `gpu_mem_clock` and `gpu_mem_temp` also need `vram` to be enabled.
+// - NOTE:Ordered only if `legacy_layout` is set to false.
 
 /// https://github.com/flightlessmango/MangoHud#environment-variables-mangohud_config-and-mangohud_configfile
-#[derive(Debug)]
+#[derive(Debug, Default)]
 #[allow(dead_code)]
-pub struct Config {
+pub struct MangoHudConfig {
     // Performance
     fps_limit: Vec<u16>,
     fps_limit_method: FpsLimitMethod,
@@ -185,12 +179,12 @@ pub struct Config {
     // gl_dont_flip: ?
 
     // Keybinds
-    toggle_hud: KeyboardShortcut, // FIXME write your own struct for distiction bw left and right shift
-    toggle_hud_position: KeyboardShortcut,
-    toggle_fps_limit: KeyboardShortcut,
-    toggle_logging: KeyboardShortcut,
-    reload_cfg: KeyboardShortcut,
-    upload_log: KeyboardShortcut,
+    toggle_hud: Vec<String>, // FIXME write your own struct for distiction bw left and right shift, etc
+    toggle_hud_position: Vec<String>,
+    toggle_fps_limit: Vec<String>,
+    toggle_logging: Vec<String>,
+    reload_cfg: Vec<String>,
+    upload_log: Vec<String>,
 
     // Logging
     autostart_log: bool,
@@ -201,34 +195,46 @@ pub struct Config {
     benchmark_percentiles: String,
 }
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, EnumString)]
+#[strum(ascii_case_insensitive)]
 pub enum FpsLimitMethod {
     Early,
     #[default]
     Late,
 }
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, EnumString)]
 pub enum VSync {
+    #[strum(serialize = "0")]
     Adaptive = 0,
     #[default]
+    #[strum(serialize = "1")]
     Off = 1,
+    #[strum(serialize = "2")]
     Mailbox = 2,
+    #[strum(serialize = "3")]
     On = 3,
 }
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, EnumString)]
 pub enum HudPreset {
     #[default]
+    #[strum(serialize = "-1")]
     Default = -1,
+    #[strum(serialize = "0")]
     Off = 0,
+    #[strum(serialize = "1")]
     FpsOnly = 1,
+    #[strum(serialize = "2")]
     Horizontal = 2,
+    #[strum(serialize = "3")]
     Extended = 3,
+    #[strum(serialize = "4")]
     Detailed = 4,
 }
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, EnumString)]
+#[strum(serialize_all = "kebab_case")]
 pub enum HudPosition {
     #[default]
     TopLeft,
@@ -240,22 +246,21 @@ pub enum HudPosition {
     BottomRight,
 }
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, EnumString)]
 pub enum FcatOverlayEdge {
     #[default]
+    #[strum(serialize = "0")]
     Left = 0,
+    #[strum(serialize = "1")]
     Bottom = 1,
+    #[strum(serialize = "2")]
     Right = 2,
+    #[strum(serialize = "3")]
     Top = 3,
 }
 
-pub enum ConfigValue<T> {
-    True,
-    Some(T),
-}
-
-impl Default for Config {
-    fn default() -> Self {
+impl MangoHudConfig {
+    pub fn new() -> Self {
         Self {
             legacy_layout: true,
             gpu_stats: true,
@@ -300,108 +305,44 @@ impl Default for Config {
             cellpadding_y: -0.085,
             table_columns: 3,
             text_outline_thickness: 1.5,
-
-            vsync: Default::default(),
-            gl_vsync: Default::default(),
-            fps_limit_method: Default::default(),
-            picmip: Default::default(),
-            af: Default::default(),
-            bicubic: Default::default(),
-            trilinear: Default::default(),
-            retro: Default::default(),
-            preset: Default::default(),
-            histogram: Default::default(),
-            custom_text_center: Default::default(),
-            time: Default::default(),
-            version: Default::default(),
-            gpu_temp: Default::default(),
-            gpu_junction_temp: Default::default(),
-            gpu_core_clock: Default::default(),
-            gpu_mem_temp: Default::default(),
-            gpu_mem_clock: Default::default(),
-            gpu_power: Default::default(),
-            gpu_text: Default::default(),
-            gpu_load_change: Default::default(),
-            cpu_temp: Default::default(),
-            cpu_power: Default::default(),
-            cpu_text: Default::default(),
-            cpu_mhz: Default::default(),
-            cpu_load_change: Default::default(),
-            core_load: Default::default(),
-            core_load_change: Default::default(),
-            io_read: Default::default(),
-            io_write: Default::default(),
-            vram: Default::default(),
-            ram: Default::default(),
-            swap: Default::default(),
-            procmem: Default::default(),
-            procmem_shared: Default::default(),
-            procmem_virt: Default::default(),
-            battery: Default::default(),
-            battery_icon: Default::default(),
-            gamepad_battery: Default::default(),
-            gamepad_battery_icon: Default::default(),
-            fps_color_change: Default::default(),
-            frame_count: Default::default(),
-            show_fps_limit: Default::default(),
-            throttling_status: Default::default(),
-            engine_version: Default::default(),
-            gpu_name: Default::default(),
-            vulkan_driver: Default::default(),
-            wine: Default::default(),
-            exec_name: Default::default(),
-            arch: Default::default(),
-            gamemode: Default::default(),
-            vkbasalt: Default::default(),
-            resolution: Default::default(),
-            custom_text: Default::default(),
-            exec: Default::default(),
-            media_player: Default::default(),
-            media_player_name: Default::default(),
-            no_small_font: Default::default(),
-            font_file: Default::default(),
-            font_file_text: Default::default(),
-            font_glyph_ranges: Default::default(),
-            position: Default::default(),
-            round_corners: Default::default(),
-            hud_no_margin: Default::default(),
-            hud_compact: Default::default(),
-            horizontal: Default::default(),
-            no_display: Default::default(),
-            offset_x: Default::default(),
-            offset_y: Default::default(),
-            width: Default::default(),
-            fcat: Default::default(),
-            fcat_screen_edge: Default::default(),
-            pci_dev: Default::default(),
-            blacklist: Default::default(),
-            control: Default::default(),
-            gl_bind_framebuffer: Default::default(),
-            toggle_hud: todo!(),
-            toggle_hud_position: todo!(),
-            toggle_fps_limit: todo!(),
-            toggle_logging: todo!(),
-            reload_cfg: todo!(),
-            upload_log: todo!(),
-            autostart_log: Default::default(),
-            log_duration: Default::default(),
-            log_interval: Default::default(),
-            output_folder: Default::default(),
-            permit_upload: Default::default(),
+            ..Default::default()
         }
     }
 }
 
-fn deserialize_by_line(lines: Lines<'_>) -> Config {
-    for line in lines.map(|s| s.trim()).filter(|s| !s.starts_with('#')) {
-        match line.split_once('=') {
-            Some((key, value)) => todo!(),
-            None => todo!(),
-        }
-    }
+pub fn parse<P: AsRef<Path>>(file: P) -> Result<MangoHudConfig> {
+    let mut map = configparser::ini::Ini::new()
+        .read(fs_err::read_to_string(file)?)
+        .map_err(|e| eyre::eyre!(e))?
+        .remove("default")
+        .ok_or_else(|| eyre::eyre!("Empty default config"))?;
+
+    let mut config = MangoHudConfig::new();
+
+    update_if_some(
+        &mut config.fps_limit,
+        map.remove("fps_limit")
+            .flatten()
+            .map(|s| parse_list(&s).ok())
+            .flatten(),
+    );
+
     todo!()
 }
 
-fn deserialize<P: AsRef<Path>>(file: P) -> Config {
-    todo!()
+fn parse_list<T>(value: &str) -> Result<Vec<T>>
+where
+    T: FromStr,
+    T::Err: Into<eyre::ErrReport>,
+{
+    value
+        .split(&[',', '+'][..])
+        .map(|s| s.parse::<T>().map_err(|e| eyre::eyre!(e)))
+        .collect::<Result<_>>()
+}
+
+fn update_if_some<T>(modify: &mut T, with: Option<T>) {
+    if let Some(with) = with {
+        *modify = with;
+    }
 }
