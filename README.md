@@ -1,3 +1,3 @@
 # MangOverlay
 
-Mangoverlay serves as a graphical configuration manager for [MangoHud](https://github.com/flightlessmango/MangoHud). It enables the serialization and deserialization of the [sample configuration](https://github.com/flightlessmango/MangoHud/blob/master/data/MangoHud.conf) and offers a user-friendly graphical interface for managing the configuration.
+Mangoverlay is a graphical configuration manager designed for [MangoHud](https://github.com/flightlessmango/MangoHud). It facilitates the serialization and deserialization of the [sample configuration](https://github.com/flightlessmango/MangoHud/blob/master/data/MangoHud.conf) while providing a user-friendly graphical interface for configuration management. With Mangoverlay, users can easily prototype the layout of the HUD, simplifying the process.
